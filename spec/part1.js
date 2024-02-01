@@ -140,6 +140,16 @@
         expect(arraySum([[1],[[2]],3,4])).to.be.a('number');
       });
 
+      it('should not use flatten or native flat method', function() {
+        var originalFlatten = flatten;
+        flatten = sinon.spy(flatten);
+        arraySum([[1],[2,3],[[4]],5]);
+        expect(flatten.called).to.be.false;
+        flatten = originalFlatten;
+        // Spying on Array.prototype.flat in testSupport.js
+        expect(Array.prototype.flat.called).to.be.false;
+      });
+
       it('should return the sum of nested arrays containing non-negative integers', function() {
         expect(arraySum([[1],[2,3],[[4]],5])).to.equal(15);
         expect(arraySum([[12,[[34],[56]],78]])).to.equal(180);
@@ -214,7 +224,11 @@
       it("should not use modulo", function() {
         var stringified = originalIsEven.toString();
         expect(stringified).to.not.contain('%');
-        expect(stringified).to.not.contain('modulo');
+        var originalModulo = modulo;
+        modulo = sinon.spy(modulo);
+        isEven(8);
+        expect(modulo.called).to.be.false;
+        modulo = originalModulo;
       });
 
       it('should return true for even numbers', function() {
@@ -686,7 +700,11 @@
         expect(stringified).to.not.contain('/');
         expect(stringified).to.not.contain('%');
         expect(stringified).to.not.contain('Math');
-        expect(stringified).to.not.contain('modulo');
+        var originalModulo = modulo;
+        modulo = sinon.spy(modulo);
+        multiply(8,4);
+        expect(modulo.called).to.be.false;
+        modulo = originalModulo;
       });
 
       it('should return the product of two positive integers', function() {
@@ -769,7 +787,11 @@
         expect(stringified).to.not.contain('/');
         expect(stringified).to.not.contain('%');
         expect(stringified).to.not.contain('Math');
-        expect(stringified).to.not.contain('modulo');
+        var originalModulo = modulo;
+        modulo = sinon.spy(modulo);
+        divide(8,4);
+        expect(modulo.called).to.be.false;
+        modulo = originalModulo;
       });
 
       it('should return the quotient of two integers', function() {
@@ -1165,7 +1187,7 @@
         expect(rMap(input, timesTwo)).to.be.an('array');
       });
 
-      it('should not use the native version of map', function() {
+      it('should not use native map method', function() {
         // Spying on Array.prototype.map in testSupport.js
         rMap(input, timesTwo);
         expect(Array.prototype.map.called).to.be.false;
@@ -1621,6 +1643,12 @@
 
       it('should return an array', function() {
         expect(flatten([1,[2],[[3]]])).to.be.an('array');
+      });
+
+      it('should not use native flat method', function() {
+        // Spying on Array.prototype.flat in testSupport.js
+        flatten([1,[2],[[3]]]);
+        expect(Array.prototype.flat.called).to.be.false;
       });
 
       it('should return flattened array', function() {
